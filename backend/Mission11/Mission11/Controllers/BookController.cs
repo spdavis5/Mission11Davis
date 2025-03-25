@@ -17,28 +17,37 @@ namespace Mission11.Controllers
 
         //Get Books route
         [HttpGet]
-        public IActionResult GetBooks(int pageHowMany, int pageNumber, string sortOrder)
+        public IActionResult GetBooks(int pageHowMany, int pageNumber, string sortOrder, [FromQuery] List<string> categoryTypes = null)
         {
+            var query = _bookContext.Books.AsQueryable();
+
             var booksQuery = _bookContext.Books.AsQueryable();
+
+            if (categoryTypes != null && categoryTypes.Any())
+            {
+                query = query.Where(p => categoryTypes.Contains(p.Category));
+            }
 
             //Sort ascending or descending
             if (sortOrder == "asc")
             {
-                booksQuery = booksQuery.OrderBy(b => b.Title);
+                query = query.OrderBy(b => b.Title);
             }
             else if (sortOrder == "desc")
             {
-                booksQuery = booksQuery.OrderByDescending(b => b.Title);
+                query = query.OrderByDescending(b => b.Title);
             }
 
+
+            //Get total books from context
+            var totalNumBooks = query.Count();
+
             //Query
-            var BookList = booksQuery
+            var BookList = query
                 .Skip((pageNumber - 1) * pageHowMany)
                 .Take(pageHowMany)
                 .ToList();
 
-            //Get total books from context
-            var totalNumBooks = _bookContext.Books.Count();
 
             var someObject = new
             {
@@ -47,6 +56,17 @@ namespace Mission11.Controllers
             };
 
             return Ok(someObject);
+        }
+
+        [HttpGet("GetProjectTypes")]
+        public IActionResult GetCategoryTypes()
+        {
+            var projectTypes = _bookContext.Books
+            .Select(p => p.Category)
+            .Distinct()
+            .ToList();
+
+        return Ok(projectTypes);
         }
     }
 }

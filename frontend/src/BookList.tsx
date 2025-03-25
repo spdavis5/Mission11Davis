@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Book } from './types/Book';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-function BookList() {
+function BookList({ selectedCategories }: { selectedCategories: string[] }) {
   // State declarations for pagination and sorting
   const [books, setBooks] = useState<Book[]>([]);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -14,8 +14,12 @@ function BookList() {
   // Fetch books whenever pagination or sort parameters change
   useEffect(() => {
     const fetchBooks = async () => {
+      const categoryParams = selectedCategories
+        .map((cat) => `categoryTypes=${encodeURIComponent(cat)}`)
+        .join('&');
+
       const response = await fetch(
-        `https://localhost:5000/api/Book?pageHowMany=${pageSize}&pageNumber=${pageNum}&sortOrder=${sortOrder}`
+        `https://localhost:5000/api/Book?pageHowMany=${pageSize}&pageNumber=${pageNum}&sortOrder=${sortOrder}${selectedCategories.length ? `&${categoryParams}` : ''}`
       );
       const data = await response.json();
 
@@ -26,7 +30,7 @@ function BookList() {
     };
 
     fetchBooks();
-  }, [pageSize, pageNum, sortOrder]);
+  }, [pageSize, pageNum, sortOrder, selectedCategories]);
 
   // Toggle between ascending and descending sort order
   const toggleSortOrder = () => {
@@ -35,9 +39,6 @@ function BookList() {
 
   return (
     <div className="container">
-      {/* Page Title */}
-      <h1 className="my-4">Book List</h1>
-
       {/* Sort Order Toggle Button */}
       <div className="mb-3">
         <button className="btn btn-secondary mb-3" onClick={toggleSortOrder}>
