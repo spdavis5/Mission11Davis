@@ -1,17 +1,20 @@
+// Updated BookList.tsx
 import { useEffect, useState } from 'react';
-import { Book } from './types/Book';
+import { Book } from '../types/Book';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
 function BookList({ selectedCategories }: { selectedCategories: string[] }) {
-  // State declarations for pagination and sorting
   const [books, setBooks] = useState<Book[]>([]);
   const [pageSize, setPageSize] = useState<number>(10);
   const [pageNum, setPageNum] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [sortOrder, setSortOrder] = useState<string>('asc');
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
 
-  // Fetch books whenever pagination or sort parameters change
   useEffect(() => {
     const fetchBooks = async () => {
       const categoryParams = selectedCategories
@@ -19,11 +22,10 @@ function BookList({ selectedCategories }: { selectedCategories: string[] }) {
         .join('&');
 
       const response = await fetch(
-        `https://localhost:5000/api/Book?pageHowMany=${pageSize}&pageNumber=${pageNum}&sortOrder=${sortOrder}${selectedCategories.length ? `&${categoryParams}` : ''}`
+        `https://localhost:5005/api/Book?pageHowMany=${pageSize}&pageNumber=${pageNum}&sortOrder=${sortOrder}${selectedCategories.length ? `&${categoryParams}` : ''}`
       );
       const data = await response.json();
 
-      // Update state with the fetched data
       setBooks(data.books);
       setTotalItems(data.totalNumBooks);
       setTotalPages(Math.ceil(data.totalNumBooks / pageSize));
@@ -32,21 +34,18 @@ function BookList({ selectedCategories }: { selectedCategories: string[] }) {
     fetchBooks();
   }, [pageSize, pageNum, sortOrder, selectedCategories]);
 
-  // Toggle between ascending and descending sort order
   const toggleSortOrder = () => {
     setSortOrder((prevSortOrder) => (prevSortOrder === 'asc' ? 'desc' : 'asc'));
   };
 
   return (
     <div className="container">
-      {/* Sort Order Toggle Button */}
       <div className="mb-3">
         <button className="btn btn-secondary mb-3" onClick={toggleSortOrder}>
           Sort: {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
         </button>
       </div>
 
-      {/* Book Cards */}
       {books.map((b) => (
         <div id="bookCard" className="card mb-3" key={b.bookID}>
           <div className="card-body">
@@ -81,13 +80,30 @@ function BookList({ selectedCategories }: { selectedCategories: string[] }) {
                 {b.price}
               </li>
             </ul>
+            <button
+              className="btn btn-success me-2"
+              onClick={() =>
+                addToCart({
+                  bookID: b.bookID,
+                  title: b.title,
+                  price: b.price,
+                  quantity: 1,
+                })
+              }
+            >
+              Add to Cart
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={() => navigate(`/purchase/${b.title}/${b.bookID}`)}
+            >
+              Purchase
+            </button>
           </div>
         </div>
       ))}
 
-      {/* Pagination Controls */}
       <div className="d-flex justify-content-center gap-2 mb-3">
-        {/* Previous Page Button */}
         <button
           className="btn btn-secondary"
           disabled={pageNum === 1}
@@ -96,7 +112,6 @@ function BookList({ selectedCategories }: { selectedCategories: string[] }) {
           Previous
         </button>
 
-        {/* Page Number Buttons */}
         {[...Array(totalPages)].map((_, index) => (
           <button
             key={index}
@@ -108,7 +123,6 @@ function BookList({ selectedCategories }: { selectedCategories: string[] }) {
           </button>
         ))}
 
-        {/* Next Page Button */}
         <button
           className="btn btn-secondary"
           disabled={pageNum === totalPages}
@@ -118,7 +132,6 @@ function BookList({ selectedCategories }: { selectedCategories: string[] }) {
         </button>
       </div>
 
-      {/* Page Size Selector */}
       <div className="mb-3">
         <label>
           Results per page:{' '}
@@ -127,7 +140,7 @@ function BookList({ selectedCategories }: { selectedCategories: string[] }) {
             value={pageSize}
             onChange={(e) => {
               setPageSize(Number(e.target.value));
-              setPageNum(1); // Reset to first page when changing page size
+              setPageNum(1);
             }}
           >
             <option value="5">5</option>
