@@ -1,4 +1,3 @@
-// Updated BookList.tsx
 import { useEffect, useState } from 'react';
 import { Book } from '../types/Book';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -18,7 +17,7 @@ function BookList({ selectedCategories }: { selectedCategories: string[] }) {
   useEffect(() => {
     const fetchBooks = async () => {
       const categoryParams = selectedCategories
-        .map((cat) => `categoryTypes=${encodeURIComponent(cat)}`)
+        .map((cat) => `categories=${encodeURIComponent(cat)}`)
         .join('&');
 
       const response = await fetch(
@@ -38,116 +37,110 @@ function BookList({ selectedCategories }: { selectedCategories: string[] }) {
     setSortOrder((prevSortOrder) => (prevSortOrder === 'asc' ? 'desc' : 'asc'));
   };
 
+  const handleAddToCart = (book: Book) => {
+    addToCart({
+      bookID: book.bookID,
+      title: book.title,
+      price: book.price,
+    });
+  };
+
   return (
-    <div className="container">
-      <div className="mb-3">
-        <button className="btn btn-secondary mb-3" onClick={toggleSortOrder}>
-          Sort: {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
-        </button>
+    <div className="container-fluid">
+      <div className="row mb-3">
+        <div className="col-auto">
+          <button className="btn btn-secondary" onClick={toggleSortOrder}>
+            Sort: {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
+          </button>
+        </div>
       </div>
 
-      {books.map((b) => (
-        <div id="bookCard" className="card mb-3" key={b.bookID}>
-          <div className="card-body">
-            <h3 className="card-title">{b.title}</h3>
-            <ul className="list-unstyled">
-              <li>
-                <strong>Author: </strong>
-                {b.author}
-              </li>
-              <li>
-                <strong>Publisher: </strong>
-                {b.publisher}
-              </li>
-              <li>
-                <strong>ISBN: </strong>
-                {b.isbn}
-              </li>
-              <li>
-                <strong>Classification: </strong>
-                {b.classification}
-              </li>
-              <li>
-                <strong>Category: </strong>
-                {b.category}
-              </li>
-              <li>
-                <strong>Page Count: </strong>
-                {b.pageCount}
-              </li>
-              <li>
-                <strong>Price: </strong>
-                {b.price}
-              </li>
-            </ul>
+      <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {books.map((b) => (
+          <div className="col" key={b.bookID}>
+            <div className="card h-100 shadow-sm">
+              <div className="card-body">
+                <h3 className="card-title">{b.title}</h3>
+                <ul className="list-unstyled">
+                  <li>
+                    <strong>Author: </strong>
+                    {b.author}
+                  </li>
+                  <li>
+                    <strong>Category: </strong>
+                    {b.category}
+                  </li>
+                  <li>
+                    <strong>Price: </strong>${b.price.toFixed(2)}
+                  </li>
+                </ul>
+                <div className="d-flex justify-content-between">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => handleAddToCart(b)}
+                  >
+                    Add to Cart
+                  </button>
+                  <button
+                    className="btn btn-outline-secondary"
+                    onClick={() => navigate(`/purchase/${b.title}/${b.bookID}`)}
+                  >
+                    Details
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="row mt-3">
+        <div className="col d-flex justify-content-center">
+          <div className="btn-group" role="group">
             <button
-              className="btn btn-success me-2"
-              onClick={() =>
-                addToCart({
-                  bookID: b.bookID,
-                  title: b.title,
-                  price: b.price,
-                  quantity: 1,
-                })
-              }
+              className="btn btn-secondary"
+              disabled={pageNum === 1}
+              onClick={() => setPageNum(pageNum - 1)}
             >
-              Add to Cart
+              Previous
             </button>
+
+            {[...Array(totalPages)].map((_, index) => (
+              <button
+                key={index}
+                className={`btn ${pageNum === index + 1 ? 'btn-primary' : 'btn-light'}`}
+                onClick={() => setPageNum(index + 1)}
+              >
+                {index + 1}
+              </button>
+            ))}
+
             <button
-              className="btn btn-primary"
-              onClick={() => navigate(`/purchase/${b.title}/${b.bookID}`)}
+              className="btn btn-secondary"
+              disabled={pageNum === totalPages}
+              onClick={() => setPageNum(pageNum + 1)}
             >
-              Purchase
+              Next
             </button>
           </div>
         </div>
-      ))}
-
-      <div className="d-flex justify-content-center gap-2 mb-3">
-        <button
-          className="btn btn-secondary"
-          disabled={pageNum === 1}
-          onClick={() => setPageNum(pageNum - 1)}
-        >
-          Previous
-        </button>
-
-        {[...Array(totalPages)].map((_, index) => (
-          <button
-            key={index}
-            className="btn btn-light"
-            onClick={() => setPageNum(index + 1)}
-            disabled={pageNum === index + 1}
-          >
-            {index + 1}
-          </button>
-        ))}
-
-        <button
-          className="btn btn-secondary"
-          disabled={pageNum === totalPages}
-          onClick={() => setPageNum(pageNum + 1)}
-        >
-          Next
-        </button>
       </div>
 
-      <div className="mb-3">
-        <label>
-          Results per page:{' '}
+      <div className="row mt-3">
+        <div className="col">
           <select
-            className="form-select d-inline-block w-auto"
+            className="form-select w-auto mx-auto"
             value={pageSize}
             onChange={(e) => {
               setPageSize(Number(e.target.value));
               setPageNum(1);
             }}
           >
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="20">20</option>
+            <option value="5">5 per page</option>
+            <option value="10">10 per page</option>
+            <option value="20">20 per page</option>
           </select>
-        </label>
+        </div>
       </div>
     </div>
   );
