@@ -17,12 +17,13 @@ function BookList({ selectedCategories }: { selectedCategories: string[] }) {
   useEffect(() => {
     const fetchBooks = async () => {
       const categoryParams = selectedCategories
-        .map((cat) => `categories=${encodeURIComponent(cat)}`)
+        .map((cat) => `categoryTypes=${encodeURIComponent(cat)}`)
         .join('&');
 
       const response = await fetch(
         `https://localhost:5005/api/Book?pageHowMany=${pageSize}&pageNumber=${pageNum}&sortOrder=${sortOrder}${selectedCategories.length ? `&${categoryParams}` : ''}`
       );
+
       const data = await response.json();
 
       setBooks(data.books);
@@ -83,7 +84,7 @@ function BookList({ selectedCategories }: { selectedCategories: string[] }) {
                   </button>
                   <button
                     className="btn btn-outline-secondary"
-                    onClick={() => navigate(`/purchase/${b.title}/${b.bookID}`)}
+                    onClick={() => navigate(`/purchase/${b.bookID}`)}
                   >
                     Details
                   </button>

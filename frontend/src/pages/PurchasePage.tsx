@@ -14,7 +14,7 @@ function PurchasePage() {
     const fetchBookDetails = async () => {
       try {
         const response = await fetch(
-          `https://localhost:5005/api/Book/${bookID}`
+          `https://localhost:5005/api/Book/GetBook?bookID=${bookID}`
         );
         const data = await response.json();
         setBook(data);
@@ -39,7 +39,7 @@ function PurchasePage() {
     }
   };
 
-  if (!book) return <div>Loading...</div>;
+  if (!book) return null;
 
   return (
     <div className="container mt-4">

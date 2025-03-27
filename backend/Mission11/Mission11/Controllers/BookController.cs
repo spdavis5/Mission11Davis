@@ -68,6 +68,14 @@ namespace Mission11.Controllers
 
         return Ok(projectTypes);
         }
+
+        [HttpGet("GetBook")]
+        public IActionResult GetBook(int bookID)
+        {
+            var book = _bookContext.Books.FirstOrDefault(p => p.BookID == bookID);
+            if (book == null) return NotFound();
+            return Ok(book);
+        }
     }
 }
 

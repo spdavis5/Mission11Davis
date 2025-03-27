@@ -31,7 +31,6 @@ function CategoryFilter({
     const updatedCategories = selectedCategories.includes(target.value)
       ? selectedCategories.filter((c) => c !== target.value)
       : [...selectedCategories, target.value];
-
     setSelectedCategories(updatedCategories);
   }
 
