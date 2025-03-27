@@ -3,13 +3,18 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { Book } from '../types/Book';
 
+/**
+ * PurchasePage Component
+ * Displays details for a specific book and allows adding it to the cart
+ */
 function PurchasePage() {
   const navigate = useNavigate();
-  const { bookID } = useParams();
-  const { addToCart } = useCart();
-  const [book, setBook] = useState<Book | null>(null);
-  const [quantity, setQuantity] = useState(1);
+  const { bookID } = useParams(); // Get the bookID from URL parameters
+  const { addToCart } = useCart(); // Get cart functionality from context
+  const [book, setBook] = useState<Book | null>(null); // Store the book details
+  const [quantity, setQuantity] = useState(1); // Track quantity to add to cart
 
+  // Fetch book details when component mounts or bookID changes
   useEffect(() => {
     const fetchBookDetails = async () => {
       try {
@@ -26,8 +31,12 @@ function PurchasePage() {
     fetchBookDetails();
   }, [bookID]);
 
+  /**
+   * Add the specified quantity of books to cart and navigate to cart page
+   */
   const handleAddToCart = () => {
     if (book) {
+      // Add the book to cart multiple times based on quantity
       for (let i = 0; i < quantity; i++) {
         addToCart({
           bookID: book.bookID,
@@ -35,15 +44,17 @@ function PurchasePage() {
           price: book.price,
         });
       }
-      navigate('/cart');
+      navigate('/cart'); // Redirect to cart page after adding
     }
   };
 
+  // Don't render anything if book data isn't loaded yet
   if (!book) return null;
 
   return (
     <div className="container mt-4">
       <div className="row">
+        {/* Book details section */}
         <div className="col-md-6">
           <h2>{book.title}</h2>
           <ul className="list-unstyled">
@@ -64,10 +75,12 @@ function PurchasePage() {
             </li>
           </ul>
         </div>
+        {/* Purchase options section */}
         <div className="col-md-6">
           <div className="card">
             <div className="card-body">
               <h4 className="card-title">Purchase Details</h4>
+              {/* Quantity selector */}
               <div className="mb-3">
                 <label className="form-label">Quantity</label>
                 <input
@@ -78,6 +91,7 @@ function PurchasePage() {
                   onChange={(e) => setQuantity(Number(e.target.value))}
                 />
               </div>
+              {/* Action buttons */}
               <div className="d-flex justify-content-between">
                 <button className="btn btn-primary" onClick={handleAddToCart}>
                   Add {quantity} to Cart
