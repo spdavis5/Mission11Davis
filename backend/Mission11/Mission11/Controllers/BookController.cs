@@ -66,7 +66,7 @@ namespace Mission11.Controllers
             .Distinct()
             .ToList();
 
-        return Ok(projectTypes);
+            return Ok(projectTypes);
         }
 
         [HttpGet("GetBook")]
@@ -75,6 +75,45 @@ namespace Mission11.Controllers
             var book = _bookContext.Books.FirstOrDefault(p => p.BookID == bookID);
             if (book == null) return NotFound();
             return Ok(book);
+        }
+
+        [HttpPost("AddBook")]
+        public IActionResult AddBook([FromBody] Book newBook)
+        {
+            _bookContext.Books.Add(newBook);
+            _bookContext.SaveChanges();
+            return Ok(newBook);
+        }
+
+        [HttpPut("UpdateBook/{BookID}")]
+        public IActionResult UpdateBook(int BookID, [FromBody] Book updatedBook)
+        {
+            var existingBook = _bookContext.Books.Find(BookID);
+
+            existingBook.Title = updatedBook.Title;
+            existingBook.Author = updatedBook.Author;
+            existingBook.Publisher = updatedBook.Publisher;
+            existingBook.Category = updatedBook.Category;
+            existingBook.Price = updatedBook.Price;
+            existingBook.ISBN = updatedBook.ISBN;
+            existingBook.Classification = updatedBook.Classification;
+
+            _bookContext.Books.Update(existingBook);
+            _bookContext.SaveChanges();
+
+            return Ok(existingBook);
+        }
+
+        [HttpDelete("DeleteBook/{BookID}")]
+        public IActionResult DeleteBook(int BookID)
+        {
+            var book = _bookContext.Books.Find(BookID);
+            if (book == null) return NotFound();
+
+            _bookContext.Books.Remove(book);
+            _bookContext.SaveChanges();
+
+            return NoContent();
         }
     }
 }
