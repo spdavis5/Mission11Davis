@@ -32,6 +32,22 @@
   },
   {
     "ContainingType": "Mission11.Controllers.BookController",
+    "Method": "GetBook",
+    "RelativePath": "api/Book/GetBook",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "bookID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Mission11.Controllers.BookController",
     "Method": "GetCategoryTypes",
     "RelativePath": "api/Book/GetProjectTypes",
     "HttpMethod": "GET",
