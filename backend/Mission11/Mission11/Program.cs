@@ -15,9 +15,9 @@ builder.Services.AddDbContext<BookContext>(options =>
 
 // Cors
 builder.Services.AddCors(options =>
-    options.AddPolicy("AllowReactApp",
+    options.AddPolicy("AllowAll",
     policy => {
-        policy.WithOrigins("https://witty-island-02e7a5a1e.6.azurestaticapps.net/")
+        policy.AllowAnyOrigin()
             .AllowAnyMethod()
             .AllowAnyHeader();
         }));
@@ -36,7 +36,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowReactApp");
+app.UseCors("AllowAll");
 
 app.UseAuthorization();
 
