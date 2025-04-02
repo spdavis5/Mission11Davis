@@ -32,9 +32,11 @@ if (app.Environment.IsDevelopment())
 }
 
 // Configure Cors
-app.UseCors("AllowReactApp");
+
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowReactApp");
 
 app.UseAuthorization();
 
