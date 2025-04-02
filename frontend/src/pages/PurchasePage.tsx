@@ -19,7 +19,8 @@ function PurchasePage() {
     const fetchBookDetails = async () => {
       try {
         const response = await fetch(
-          `https://localhost:5005/api/Book/GetBook?bookID=${bookID}`
+          `https://mission13davis-backend.azurewebsites.net/api/Book/GetBook?bookID=${bookID}`
+          //https://localhost:5005/api/Book/GetBook?bookID=${bookID}
         );
         const data = await response.json();
         setBook(data);
