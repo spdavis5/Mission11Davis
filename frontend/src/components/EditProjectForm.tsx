@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { addBook, updateBook } from '../api/ProjectsAPI';
+import { updateBook } from '../api/ProjectsAPI';
 import { Book } from '../types/Book';
 
 interface EditBookFormProps {
